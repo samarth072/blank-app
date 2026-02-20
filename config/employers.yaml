@@ -1,0 +1,147 @@
+# Workday employer portals for direct job scraping
+# Add or remove employers to customize discovery
+employers:
+  - name: Google
+    workday_url: https://www.google.com/about/careers/applications/jobs/results
+    type: direct
+  - name: Amazon
+    workday_url: https://www.amazon.jobs/en/search
+    type: direct
+  - name: Microsoft
+    workday_url: https://careers.microsoft.com/us/en/search-results
+    type: direct
+  - name: Apple
+    workday_url: https://jobs.apple.com/en-us/search
+    type: direct
+  - name: Meta
+    workday_url: https://www.metacareers.com/jobs
+    type: direct
+  - name: Netflix
+    workday_url: https://jobs.netflix.com/search
+    type: direct
+  - name: Salesforce
+    workday_url: https://careers.salesforce.com/en/jobs/
+    type: workday
+  - name: Adobe
+    workday_url: https://careers.adobe.com/us/en/search-results
+    type: direct
+  - name: Uber
+    workday_url: https://www.uber.com/us/en/careers/list/
+    type: direct
+  - name: Airbnb
+    workday_url: https://careers.airbnb.com/positions/
+    type: direct
+  - name: Stripe
+    workday_url: https://stripe.com/jobs/search
+    type: direct
+  - name: Shopify
+    workday_url: https://www.shopify.com/careers/search
+    type: direct
+  - name: Twitter/X
+    workday_url: https://careers.twitter.com/en/roles.html
+    type: direct
+  - name: Spotify
+    workday_url: https://www.lifeatspotify.com/jobs
+    type: direct
+  - name: Snap
+    workday_url: https://careers.snap.com/jobs
+    type: direct
+  - name: Pinterest
+    workday_url: https://www.pinterestcareers.com/jobs/
+    type: direct
+  - name: Databricks
+    workday_url: https://www.databricks.com/company/careers/open-positions
+    type: direct
+  - name: Snowflake
+    workday_url: https://careers.snowflake.com/us/en/search-results
+    type: workday
+  - name: Palantir
+    workday_url: https://www.palantir.com/careers/
+    type: direct
+  - name: Coinbase
+    workday_url: https://www.coinbase.com/careers/positions
+    type: direct
+  - name: Figma
+    workday_url: https://www.figma.com/careers/#job-openings
+    type: direct
+  - name: Notion
+    workday_url: https://www.notion.so/careers
+    type: direct
+  - name: Discord
+    workday_url: https://discord.com/careers
+    type: direct
+  - name: Twitch
+    workday_url: https://www.twitch.tv/jobs/en/
+    type: direct
+  - name: Reddit
+    workday_url: https://www.redditinc.com/careers
+    type: direct
+  - name: Dropbox
+    workday_url: https://jobs.dropbox.com/all-jobs
+    type: direct
+  - name: Slack
+    workday_url: https://slack.com/careers#openings
+    type: direct
+  - name: Zoom
+    workday_url: https://careers.zoom.us/jobs/search
+    type: direct
+  - name: DocuSign
+    workday_url: https://careers.docusign.com/jobs/search
+    type: workday
+  - name: Atlassian
+    workday_url: https://www.atlassian.com/company/careers/all-jobs
+    type: direct
+  - name: HubSpot
+    workday_url: https://www.hubspot.com/careers/jobs
+    type: direct
+  - name: Twilio
+    workday_url: https://www.twilio.com/en-us/company/jobs
+    type: direct
+  - name: Okta
+    workday_url: https://www.okta.com/company/careers/
+    type: direct
+  - name: MongoDB
+    workday_url: https://www.mongodb.com/company/careers/teams
+    type: direct
+  - name: Elastic
+    workday_url: https://www.elastic.co/careers/
+    type: direct
+  - name: Cloudflare
+    workday_url: https://www.cloudflare.com/careers/jobs/
+    type: direct
+  - name: Datadog
+    workday_url: https://careers.datadoghq.com/all-jobs/
+    type: direct
+  - name: Palo Alto Networks
+    workday_url: https://jobs.paloaltonetworks.com/en/jobs/
+    type: workday
+  - name: CrowdStrike
+    workday_url: https://crowdstrike.wd5.myworkdayjobs.com/crowdstrikecareers
+    type: workday
+  - name: Zscaler
+    workday_url: https://www.zscaler.com/careers/job-openings
+    type: direct
+  - name: ServiceNow
+    workday_url: https://careers.servicenow.com/jobs/search
+    type: workday
+  - name: Workday
+    workday_url: https://workday.wd5.myworkdayjobs.com/Workday
+    type: workday
+  - name: Intuit
+    workday_url: https://jobs.intuit.com/search-jobs
+    type: direct
+  - name: Block (Square)
+    workday_url: https://block.xyz/careers/jobs
+    type: direct
+  - name: Robinhood
+    workday_url: https://robinhood.com/us/en/careers/openings/
+    type: direct
+  - name: Plaid
+    workday_url: https://plaid.com/careers/openings/
+    type: direct
+  - name: Rippling
+    workday_url: https://www.rippling.com/careers/open-roles
+    type: direct
+  - name: Scale AI
+    workday_url: https://scale.com/careers#open-positions
+    type: direct
