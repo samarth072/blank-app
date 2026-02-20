@@ -20,6 +20,8 @@ def discover_jobs(preferences: SearchPreferences, progress_callback=None) -> lis
         "glassdoor": JobSource.GLASSDOOR,
         "zip_recruiter": JobSource.ZIP_RECRUITER,
         "google": JobSource.GOOGLE,
+        "remotive": JobSource.REMOTIVE,
+        "arbeitnow": JobSource.ARBEITNOW,
     }
 
     for title_query in preferences.job_titles:
@@ -34,6 +36,7 @@ def discover_jobs(preferences: SearchPreferences, progress_callback=None) -> lis
                     remote=preferences.remote_only,
                     max_results=preferences.max_results_per_source,
                     job_types=preferences.include_job_types,
+                    progress_callback=progress_callback,
                 )
 
                 for raw_job in jobs:
@@ -83,19 +86,27 @@ def _search_jobspy(
     remote: bool,
     max_results: int,
     job_types: list[str],
+    progress_callback=None,
 ) -> list[dict]:
     """Search using python-jobspy library."""
-    from jobspy import scrape_jobs
+    try:
+        from jobspy import scrape_jobs
+    except ImportError:
+        if progress_callback:
+            progress_callback("  python-jobspy not installed, trying API fallback...")
+        return _search_api_fallback(query, location, remote, max_results, progress_callback)
 
-    # Try sites individually so one failure doesn't kill the whole search
+    # Detect country from location
+    country = _detect_country(location)
+
     all_sites = ["indeed", "linkedin", "google", "zip_recruiter", "glassdoor"]
     all_results = []
 
     base_kwargs = {
         "search_term": query,
         "results_wanted": max_results,
-        "hours_old": 168,  # 7 days for more results
-        "country_indeed": "USA",
+        "hours_old": 168,
+        "country_indeed": country,
     }
 
     if location:
@@ -120,8 +131,11 @@ def _search_jobspy(
         df = scrape_jobs(site_name=all_sites, **base_kwargs)
         if not df.empty:
             return df.to_dict("records")
-    except Exception:
-        pass
+        if progress_callback:
+            progress_callback("  All sites returned 0 results, trying individually...")
+    except Exception as e:
+        if progress_callback:
+            progress_callback(f"  Combined search failed: {e}")
 
     # If that fails, try each site individually
     for site in all_sites:
@@ -129,10 +143,125 @@ def _search_jobspy(
             df = scrape_jobs(site_name=[site], **base_kwargs)
             if not df.empty:
                 all_results.extend(df.to_dict("records"))
-        except Exception:
+                if progress_callback:
+                    progress_callback(f"  {site}: found {len(df)} jobs")
+            else:
+                if progress_callback:
+                    progress_callback(f"  {site}: 0 results")
+        except Exception as e:
+            if progress_callback:
+                progress_callback(f"  {site} error: {e}")
             continue
 
+    # If scraping failed entirely, try API fallback
+    if not all_results:
+        if progress_callback:
+            progress_callback("  Scraping returned 0 results, trying API fallback...")
+        all_results = _search_api_fallback(query, location, remote, max_results, progress_callback)
+
     return all_results
+
+
+def _detect_country(location: str) -> str:
+    """Detect country from location string for Indeed's country_indeed param."""
+    if not location:
+        return "USA"
+    loc = location.lower().strip()
+    country_map = {
+        "india": "India",
+        "usa": "USA",
+        "united states": "USA",
+        "uk": "UK",
+        "united kingdom": "UK",
+        "canada": "Canada",
+        "australia": "Australia",
+        "germany": "Germany",
+        "france": "France",
+        "remote": "USA",
+    }
+    for key, value in country_map.items():
+        if key in loc:
+            return value
+    return "USA"
+
+
+def _search_api_fallback(
+    query: str,
+    location: str,
+    remote: bool,
+    max_results: int,
+    progress_callback=None,
+) -> list[dict]:
+    """Fallback: use free job APIs when scraping is blocked."""
+    import requests
+
+    results = []
+
+    # 1. Remotive API (free, no key, remote jobs)
+    if remote or (location and "remote" in location.lower()):
+        try:
+            resp = requests.get(
+                "https://remotive.com/api/remote-jobs",
+                params={"search": query, "limit": max_results},
+                timeout=15,
+            )
+            if resp.status_code == 200:
+                data = resp.json()
+                for job in data.get("jobs", [])[:max_results]:
+                    results.append({
+                        "title": job.get("title", ""),
+                        "company_name": job.get("company_name", ""),
+                        "location": job.get("candidate_required_location", "Remote"),
+                        "job_url": job.get("url", ""),
+                        "description": job.get("description", ""),
+                        "date_posted": job.get("publication_date", ""),
+                        "job_type": job.get("job_type", ""),
+                        "salary": job.get("salary", ""),
+                        "site": "remotive",
+                    })
+                if progress_callback:
+                    progress_callback(f"  Remotive API: found {len(results)} remote jobs")
+        except Exception as e:
+            if progress_callback:
+                progress_callback(f"  Remotive API error: {e}")
+
+    # 2. Arbeitnow API (free, no key, general + remote jobs)
+    try:
+        params = {"search": query, "page": 1}
+        if remote or (location and "remote" in location.lower()):
+            params["remote"] = "true"
+        resp = requests.get(
+            "https://www.arbeitnow.com/api/job-board-api",
+            params=params,
+            timeout=15,
+        )
+        if resp.status_code == 200:
+            data = resp.json()
+            count = 0
+            for job in data.get("data", [])[:max_results]:
+                loc_str = job.get("location", "")
+                # Filter by location if specified and not remote
+                if location and "remote" not in location.lower():
+                    if location.lower() not in loc_str.lower():
+                        continue
+                results.append({
+                    "title": job.get("title", ""),
+                    "company_name": job.get("company_name", ""),
+                    "location": loc_str,
+                    "job_url": job.get("url", ""),
+                    "description": job.get("description", ""),
+                    "date_posted": job.get("created_at", ""),
+                    "job_type": ",".join(job.get("tags", [])),
+                    "site": "arbeitnow",
+                })
+                count += 1
+            if progress_callback:
+                progress_callback(f"  Arbeitnow API: found {count} jobs")
+    except Exception as e:
+        if progress_callback:
+            progress_callback(f"  Arbeitnow API error: {e}")
+
+    return results
 
 
 

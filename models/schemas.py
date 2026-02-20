@@ -17,6 +17,8 @@ class JobSource(str, Enum):
     ZIP_RECRUITER = "zip_recruiter"
     GOOGLE = "google"
     WORKDAY = "workday"
+    REMOTIVE = "remotive"
+    ARBEITNOW = "arbeitnow"
     DIRECT = "direct"
 
 
