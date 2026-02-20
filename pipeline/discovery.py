@@ -85,48 +85,55 @@ def _search_jobspy(
     job_types: list[str],
 ) -> list[dict]:
     """Search using python-jobspy library."""
-    try:
-        from jobspy import scrape_jobs
+    from jobspy import scrape_jobs
 
-        kwargs = {
-            "site_name": ["indeed", "linkedin", "glassdoor", "zip_recruiter", "google"],
-            "search_term": query,
-            "results_wanted": max_results,
-            "hours_old": 72,
-            "country_indeed": "USA",
+    # Try sites individually so one failure doesn't kill the whole search
+    all_sites = ["indeed", "linkedin", "google", "zip_recruiter", "glassdoor"]
+    all_results = []
+
+    base_kwargs = {
+        "search_term": query,
+        "results_wanted": max_results,
+        "hours_old": 168,  # 7 days for more results
+        "country_indeed": "USA",
+    }
+
+    if location:
+        base_kwargs["location"] = location
+
+    if remote:
+        base_kwargs["is_remote"] = True
+
+    if job_types:
+        type_map = {
+            "fulltime": "fulltime",
+            "parttime": "parttime",
+            "contract": "contract",
+            "internship": "internship",
         }
+        mapped = [type_map[t] for t in job_types if t in type_map]
+        if mapped:
+            base_kwargs["job_type"] = mapped[0]
 
-        if location:
-            kwargs["location"] = location
-
-        if remote:
-            kwargs["is_remote"] = True
-
-        if job_types:
-            type_map = {
-                "fulltime": "fulltime",
-                "parttime": "parttime",
-                "contract": "contract",
-                "internship": "internship",
-            }
-            mapped = [type_map[t] for t in job_types if t in type_map]
-            if mapped:
-                kwargs["job_type"] = mapped[0]
-
-        df = scrape_jobs(**kwargs)
-        return df.to_dict("records") if not df.empty else []
-
-    except ImportError:
-        return _search_fallback(query, location, max_results)
+    # Try all sites together first
+    try:
+        df = scrape_jobs(site_name=all_sites, **base_kwargs)
+        if not df.empty:
+            return df.to_dict("records")
     except Exception:
-        return _search_fallback(query, location, max_results)
+        pass
 
+    # If that fails, try each site individually
+    for site in all_sites:
+        try:
+            df = scrape_jobs(site_name=[site], **base_kwargs)
+            if not df.empty:
+                all_results.extend(df.to_dict("records"))
+        except Exception:
+            continue
 
-def _search_fallback(query: str, location: str, max_results: int) -> list[dict]:
-    """Fallback: return empty list if jobspy is not available.
-    In production, this would use requests to scrape job boards directly.
-    """
-    return []
+    return all_results
+
 
 
 def _format_salary(raw_job: dict) -> str:
