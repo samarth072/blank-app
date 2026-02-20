@@ -119,7 +119,7 @@ with tab1:
     experiences = []
     for i in range(int(num_experiences)):
         with st.expander(f"Position {i + 1}", expanded=i < len(profile.work_experience)):
-            existing = profile.work_experience[i] if i < len(profile.work_experience) else WorkExperience(company="", title="")
+            existing = profile.work_experience[i] if i < len(profile.work_experience) else WorkExperience(company="", title="", start_date="")
             col1, col2 = st.columns(2)
             with col1:
                 company = st.text_input(f"Company #{i+1}", value=existing.company, key=f"exp_company_{i}")
