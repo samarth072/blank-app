@@ -47,6 +47,10 @@ def discover_jobs(preferences: SearchPreferences, progress_callback=None) -> lis
                     if company in preferences.exclude_companies:
                         continue
 
+                    job_title = raw_job.get("title", "").lower()
+                    if any(kw.lower() in job_title for kw in preferences.exclude_keywords):
+                        continue
+
                     source_str = raw_job.get("site", "indeed")
                     source = source_map.get(source_str, JobSource.INDEED)
 

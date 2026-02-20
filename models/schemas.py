@@ -107,6 +107,7 @@ class SearchPreferences(BaseModel):
     min_score: int = 7
     max_results_per_source: int = 25
     exclude_companies: list[str] = Field(default_factory=list)
+    exclude_keywords: list[str] = Field(default_factory=list)
     include_job_types: list[str] = Field(
         default_factory=lambda: ["fulltime", "contract"]
     )

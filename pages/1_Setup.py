@@ -236,6 +236,16 @@ with tab2:
     )
     prefs.exclude_companies = [c.strip() for c in exclude_text.split("\n") if c.strip()]
 
+    st.markdown("#### Excluded Keywords")
+    st.caption("Jobs with these keywords in the title will be skipped (case-insensitive)")
+    exclude_kw_text = st.text_area(
+        "Keywords to exclude (one per line)",
+        value="\n".join(prefs.exclude_keywords),
+        height=60,
+        placeholder="accounting\naccountant\nbookkeeping\ntax\naudit\n...",
+    )
+    prefs.exclude_keywords = [k.strip() for k in exclude_kw_text.split("\n") if k.strip()]
+
     if st.button("Save Preferences", type="primary"):
         save_preferences(prefs)
         st.success("Preferences saved!")

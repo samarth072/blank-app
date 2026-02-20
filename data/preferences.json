@@ -1,0 +1,50 @@
+{
+  "job_titles": [
+    "Financial Analyst",
+    "Junior Financial Analyst",
+    "FP&A Analyst",
+    "Investment Banking Analyst",
+    "Equity Research Analyst",
+    "Junior Equity Analyst",
+    "Corporate Finance Analyst",
+    "Financial Planning Analyst",
+    "Business Analyst Finance",
+    "Valuation Analyst",
+    "M&A Analyst",
+    "Credit Analyst",
+    "Risk Analyst",
+    "Treasury Analyst"
+  ],
+  "locations": [
+    "Remote",
+    "New York, NY",
+    "Chicago, IL",
+    "San Francisco, CA",
+    "Charlotte, NC",
+    "Boston, MA"
+  ],
+  "remote_only": false,
+  "min_score": 6,
+  "max_results_per_source": 25,
+  "exclude_companies": [],
+  "exclude_keywords": [
+    "accounting",
+    "accountant",
+    "bookkeeper",
+    "bookkeeping",
+    "tax",
+    "audit",
+    "auditor",
+    "accounts payable",
+    "accounts receivable",
+    "CPA",
+    "payroll",
+    "controller",
+    "general ledger"
+  ],
+  "include_job_types": [
+    "fulltime",
+    "contract",
+    "internship"
+  ]
+}
